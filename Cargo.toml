@@ -4,6 +4,7 @@ version = "0.1.1"
 edition = "2018"
 description = "combine for rust (only the client)"
 license = "MIT"
+include = ["README.md", "src/combine.rs", "Cargo.toml"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

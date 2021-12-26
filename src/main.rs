@@ -16,3 +16,7 @@ async fn main () {
 
   println!("{:?}", t);
 }
+
+pub fn test () {
+  println!("test")
+}

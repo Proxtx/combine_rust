@@ -2,6 +2,9 @@ use serde::{Serialize, Deserialize};
 use reqwest::Error;
 use std::collections::HashMap;
 
+pub use serde;
+pub use serde_json;
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CombineInfoModules {
   success: bool,

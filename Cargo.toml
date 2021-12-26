@@ -1,5 +1,5 @@
 [package]
-name = "combine"
+name = "combine_rust"
 version = "0.1.0"
 edition = "2018"
 description = "combine for rust (only the client)"

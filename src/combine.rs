@@ -83,8 +83,15 @@ async fn get_combine_value (client: &reqwest::Client, host: &str, module: &str, 
   Ok(run_combine_function(client, host, module, export, CombineArguments::new()).await?)
 }
 
-fn unwrap_result <ContentType: serde::de::DeserializeOwned> (result: Result<serde_json::Value, reqwest::Error>) -> ContentType {
-  serde_json::from_value(result.unwrap()).unwrap()
+fn unwrap_result <ContentType: serde::de::DeserializeOwned> (result: Result<serde_json::Value, reqwest::Error>) -> Result<ContentType, &'static str> {
+  let result = match result {
+    Ok(result) => result,
+    Err(error) => return Err("Cant fetch") 
+  };
+  return match serde_json::from_value(result) {
+    Ok(result) => Ok(result),
+    Err(error) => Err("Cant parse.")
+  }
 }
 
 pub struct Combine {
@@ -109,13 +116,11 @@ impl Combine {
     get_combine_info_exports(&self.client, &self.host, module).await
   }
 
-  pub async fn run_combine_function <ContentType: serde::de::DeserializeOwned> (&self, export: &str, arguments: CombineArguments) -> ContentType {
-   let result: ContentType = unwrap_result(run_combine_function(&self.client, &self.host, &self.module, export, arguments).await);
-   result
+  pub async fn run_combine_function <ContentType: serde::de::DeserializeOwned> (&self, export: &str, arguments: CombineArguments) -> Result<ContentType, &'static str> {
+   unwrap_result(run_combine_function(&self.client, &self.host, &self.module, export, arguments).await)
   }
 
-  pub async fn get_combine_value <ContentType: serde::de::DeserializeOwned>  (&self, export: &str) -> ContentType {
-    let result: ContentType = unwrap_result(get_combine_value(&self.client, &self.host, &self.module, export).await);
-    result
+  pub async fn get_combine_value <ContentType: serde::de::DeserializeOwned>  (&self, export: &str) -> Result<ContentType, &'static str> {
+    unwrap_result(get_combine_value(&self.client, &self.host, &self.module, export).await)
   }
 }

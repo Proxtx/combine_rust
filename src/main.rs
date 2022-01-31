@@ -16,7 +16,7 @@ async fn main () {
 
   println!("{:?}", t);*/
   let api = combine_rust::combine::Combine::new("http://localhost:3001/api/", "api.js").await;
-  let shutdown: combine_rust::combine::serde_json::Value = api.run_combine_function("shutdown", combine_rust::combine::CombineArguments::new()).await;
+  let shutdown: combine_rust::combine::serde_json::Value = api.run_combine_function("shutdown", combine_rust::combine::CombineArguments::new()).await.unwrap();
     println!("{:?}", shutdown);
 }
 

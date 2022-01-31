@@ -14,31 +14,16 @@ pub struct CombineInfoModules {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CombineInfoExports {
   success: bool,
-  info: Vec<CombineInfoExportsEntry>
+  functions: serde_json::Value
 }
 
 impl Default for CombineInfoExports {
   fn default() -> CombineInfoExports{
     CombineInfoExports {
       success: false,
-      info: Vec::new()
+      functions: serde_json::from_str("{}").unwrap()
     }
   } 
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct CombineInfoExportsEntry {
-  export: String,
-  function: bool
-}
-
-impl Default for CombineInfoExportsEntry {
-  fn default() -> CombineInfoExportsEntry {
-    CombineInfoExportsEntry{
-      export: String::from(""),
-      function: false
-    }
-  }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -65,23 +50,13 @@ impl CombineArguments {
   }
 }
 
-async fn get_combine_info_modules (client: &reqwest::Client, host:&str) -> Result<CombineInfoModules, Error> {
-  let mut href = String::from(host);
-  href.push_str("info");
-  let result_text = client.post(href).send().await?.text().await?;
-  let combine_info_modules: CombineInfoModules = serde_json::from_str(&result_text).unwrap();
-  if !combine_info_modules.success {
-    panic!("get_combine_info_modules failed did return a success true")
-  }
-  Ok(combine_info_modules)
-}
-
 async fn get_combine_info_exports (client: &reqwest::Client, host:&str, module: &str) -> Result<CombineInfoExports, Error> {
   let mut href = String::from(host);
-  href.push_str("info");
+  href.push_str("data");
 
   let mut map = HashMap::new();
   map.insert("module", module);
+  map.insert("info", "true");
 
   let result_text = client.post(href).json(&map).send().await?.text().await?;
   let combine_info_exports: CombineInfoExports = serde_json::from_str(&result_text).unwrap();
@@ -128,10 +103,6 @@ impl Combine {
     let _result = combine.get_combine_info_exports(&module).await;
 
     combine
-  }
-
-  pub async fn get_combine_info_modules (&self) -> Result<CombineInfoModules, Error> {
-    get_combine_info_modules(&self.client, &self.host).await
   }
 
   pub async fn get_combine_info_exports (&self, module: &str) -> Result<CombineInfoExports, Error> {
